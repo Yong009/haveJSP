@@ -15,13 +15,13 @@ public class JDBCConnect {
 	public ResultSet rs;
 
 
-	public JDBCConnect(String drv, String url, String id, String pw) {
+	public JDBCConnect() {
 		try {
 
 			Class.forName("oracle.jdbc.OracleDriver");
 
-			 url = "jdbc:oracle:thin:@localhost:1521:xe";
-			 id = "musthave";
+			String url = "jdbc:oracle:thin:@localhost:1521:xe";
+			String id = "musthave";
 			String pwd = "1234";
 			con = DriverManager.getConnection(url,id,pwd);
 
@@ -33,12 +33,41 @@ public class JDBCConnect {
 
 	}
 
+
+
+	public JDBCConnect(String drv, String url, String id, String pw) {
+		try {
+
+			Class.forName("oracle.jdbc.OracleDriver");
+
+			url = "jdbc:oracle:thin:@localhost:1521:xe";
+			id = "musthave";
+			String pwd = "1234";
+			con = DriverManager.getConnection(url,id,pwd);
+
+			System.out.println("DB 연결 성공");
+		}
+		catch(Exception e) {
+			e.printStackTrace();
+		}
+
+	}
+
+
 	public void close() {
 		try {
-			if(rs != null) rs.close();
-			if(stmt != null) stmt.close();
-			if(psmt != null) psmt.close();
-			if(con != null) con.close();
+			if(rs != null) {
+				rs.close();
+			}
+			if(stmt != null) {
+				stmt.close();
+			}
+			if(psmt != null) {
+				psmt.close();
+			}
+			if(con != null) {
+				con.close();
+			}
 
 			System.out.println("JDBC 자원 해제");
 		}
