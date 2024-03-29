@@ -3,6 +3,7 @@
 <%@ page import ="java.util.Map" %>
 <%@ page import ="board.BoardDAO" %>
 <%@ page import ="board.BoardDTO" %>
+<%@ page import ="utils.BoardPage" %>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
 
@@ -19,7 +20,25 @@ if (searchWord != null){
 }
 
 int totalCount = dao.selectCount(param);
-List<BoardDTO> boardLists = dao.selectList(param);
+
+//int pageSize = Integer.parseInt(application.getInitParameter("POSTS_PER_PAGE"));
+//int blockPage = Integer.parseInt(application.getInitParameter("PAGES_PER_BLOCK"));
+int pageSize = 10;
+int blockPage = 5;
+int totalPage = (int)Math.ceil((double)totalCount/ pageSize);
+
+
+int pageNum = 1;
+String pageTemp = request.getParameter("pageNum");
+if (pageTemp != null && !pageTemp.equals(""))
+	pageNum = Integer.parseInt(pageTemp);
+
+int start = (pageNum - 1) * pageSize+1;
+int end = pageNum * pageSize;
+param.put("start",start);
+param.put("end",end);
+
+List<BoardDTO> boardLists = dao.selectListPage(param);
 dao.close();
 %>
 <!DOCTYPE html>
@@ -29,8 +48,9 @@ dao.close();
 <title>Insert title here</title>
 </head>
 <body>
+
 	<jsp:include page="Link.jsp"></jsp:include>
-	<h2>목록 보기</h2>
+	<h2>목록 보기 - 현재페이지 : <%= pageNum %> (전체 : <%=totalPage %>)</h2>
 
 	<form method="get">
 
@@ -71,8 +91,9 @@ if (boardLists.isEmpty()){
 <%
 }else {
 	int virtualNum = 0;
+	int countNum = 0;
 	for (BoardDTO dto : boardLists){
-		virtualNum = totalCount--;
+		virtualNum = totalCount - (((pageNum -1) * pageSize) + countNum++);
 %>
 	<tr align="center">
 		<td><%= virtualNum  %></td>
@@ -91,7 +112,10 @@ if (boardLists.isEmpty()){
 
 	<table border="1" width="90%">
 
-		<tr align="right">
+		<tr align="center">
+			<td>
+				<%= BoardPage.PagingStr(totalCount, pageSize, blockPage,pageNum, request.getRequestURI()) %>
+			</td>
 			<td><button type="button" onclick="location.href='Write.jsp';">글쓰기</button></td>
 		</tr>
 	</table>
